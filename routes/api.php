@@ -20,6 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware(['auth:sanctum','role:admin'])->group(function () {
     Route::get('/admin/dashboard',function(){
-        return response()->json(['message'=>'Welcome admin'])
-    })
+        return response()->json(['message'=>'Welcome admin']);
+    });
 });

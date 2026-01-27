@@ -23,6 +23,6 @@ class AuthController extends Controller
             'token'=>$token,
             'role'=>$user->role,
             'user'=>$user
-        ])
+        ]);
     }
 }

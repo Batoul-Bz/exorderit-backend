@@ -17,7 +17,7 @@ class RoleMiddleware
     {
         $user=$request->user();
         if(!user || !in_array($request->user()->role,$roles)){
-            return response()->json(['message'=>'Forbidden'])
+            return response()->json(['message'=>'Forbidden']);
         }
         return $next($request);
     }
