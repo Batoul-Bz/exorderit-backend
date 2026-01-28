@@ -16,13 +16,13 @@ return [
 
     */
 
-    'allowed_origins' => [
-    'http://localhost:3000', // Next.js
-],
+   
  
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*','sanctum/csrf-cookie'], 
 
     'allowed_methods' => ['*'],
+
+    'allowed_origins' => ['http://localhost:3000','http://192.168.43.117:3000'],
 
     'allowed_origins_patterns' => [],
 

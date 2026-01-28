@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -14,9 +15,9 @@ class AuthController extends Controller
             'password'=>'required'
         ]);
         if(!Auth::attempt($request->only('email','password'))){
-            return response()->json(['message'=>'Invalid credentials']);
+            return response()->json(['message'=>'Invalid credentials'],"vide");
         }
-        $user=$request->user();
+        $user=Auth::user();
         $token=$user->createToken('api')->plainTextToken;
 
         return response()->json([
