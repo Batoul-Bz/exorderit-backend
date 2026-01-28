@@ -28,7 +28,7 @@ class PlanningController extends Controller
     'jour' => 'Lundi',
     'heure' => '08:00',
     'salle' => '101',
-    'statut' => 'draft',// cùest q dire en attente
+    'statut' => 'draft',// c'est q dire en attente
     'action' => 'Voir les documents',
     'visible_to' => ['admin']//permission just pour admin c'est just example pour debut
 ]);
@@ -62,7 +62,6 @@ public function publish(Request $request, $id)
         'message' => 'Planning published successfully',
         'planning' => $planning
     ]);}catch(\Throwable $e) {
-        // هذا يعطي تفاصيل الخطأ في console عند التطوير
         return response()->json([
             'message' => 'Server error',
             'error' => $e->getMessage()
