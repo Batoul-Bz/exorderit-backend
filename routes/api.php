@@ -10,11 +10,14 @@ Route::get('/health',function(){
 
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::post('/plannings/{id}/publish', [PlanningController::class, 'publish']);
 //|--------------------------------------------------------------------------
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth:sanctum')->post('/planning/{planning}/publish',[PlanningController::class,'publish']);
 
 Route::middleware('auth:sanctum')->get('/dashboard', [DashboardController::class,'index']);
 

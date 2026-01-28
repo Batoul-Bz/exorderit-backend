@@ -32,6 +32,43 @@ class PlanningController extends Controller
     'action' => 'Voir les documents',
     'visible_to' => ['admin']//permission just pour admin c'est just example pour debut
 ]);
-    return response()->json($planning, 201);
+   
+    return response()->json($planning);
     }
+
+     public function index(Request $request)
+{
+    $user = $request->user();      
+    $role = $user->role;           
+
+    $plannings = Planning::whereJsonContains('visible_to', $role)->get();
+
+    return response()->json($plannings);
+}
+
+public function publish(Request $request, $id)
+{
+    try{$planning = Planning::findOrFail($id);
+    $existingRoles = json_decode($planning->visible_to, true) ?? []; // تحويل JSON إلى array
+
+    $newRoles = $request->input('roles'); 
+
+    $planning->visible_to = array_unique(array_merge($planning->visible_to ?? [], $newRoles));
+
+    $planning->statut = 'published';
+    $planning->save();
+
+    return response()->json([
+        'message' => 'Planning published successfully',
+        'planning' => $planning
+    ]);}catch(\Throwable $e) {
+        // هذا يعطي تفاصيل الخطأ في console عند التطوير
+        return response()->json([
+            'message' => 'Server error',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+    
+}
+
 }
