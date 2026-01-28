@@ -49,7 +49,7 @@ class PlanningController extends Controller
 public function publish(Request $request, $id)
 {
     try{$planning = Planning::findOrFail($id);
-    $existingRoles = json_decode($planning->visible_to, true) ?? []; // تحويل JSON إلى array
+    $existingRoles = json_decode($planning->visible_to, true) ?? []; 
 
     $newRoles = $request->input('roles'); 
 
