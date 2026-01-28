@@ -19,6 +19,7 @@ class PlanningController extends Controller
             'statut' => 'nullable|in:draft,published',
             'action' => 'nullable|string',
         ]);
+        //example pour affi
     $planning = Planning::create([
     'niveau' => '1ère',
     'groupe' => 'A',
@@ -27,9 +28,9 @@ class PlanningController extends Controller
     'jour' => 'Lundi',
     'heure' => '08:00',
     'salle' => '101',
-    'statut' => 'draft',
+    'statut' => 'draft',// cùest q dire en attente
     'action' => 'Voir les documents',
-    'visible_to' => ['admin']
+    'visible_to' => ['admin']//permission just pour admin c'est just example pour debut
 ]);
     return response()->json($planning, 201);
     }
