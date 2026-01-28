@@ -48,26 +48,89 @@ class PlanningController extends Controller
 
 public function publish(Request $request, $id)
 {
-    try{$planning = Planning::findOrFail($id);
-    $existingRoles = json_decode($planning->visible_to, true) ?? []; 
+    if (!auth()->user()->is_admin) {
+        return response()->json(['message' => 'Forbidden'], 403);
+    }
+    $plannings = Planning::where('statut', 'accepted')->get();
+     if ($plannings->isEmpty()) {
+        return response()->json([
+            'message' => 'Aucun planning accepté à publier'
+        ], 400);
+    }
 
-    $newRoles = $request->input('roles'); 
+    foreach ($plannings as $planning) {
+        $planning->update([
+            'statut' => 'published',
+            'action' => 'published',
+        ]);
 
-    $planning->visible_to = array_unique(array_merge($planning->visible_to ?? [], $newRoles));
-
-    $planning->statut = 'published';
-    $planning->save();
+        PlanningHistorique::create([
+            'planning_id' => $planning->id,
+            'action' => 'published',
+        ]);
+    }
 
     return response()->json([
-        'message' => 'Planning published successfully',
-        'planning' => $planning
-    ]);}catch(\Throwable $e) {
-        return response()->json([
-            'message' => 'Server error',
-            'error' => $e->getMessage()
-        ], 500);
-    }
+        'message' => 'Tous les plannings acceptés ont été publiés',
+        'count' => $plannings->count()
+    ]);
+}
+
+public function accept($id)
+{
     
+    if (!auth()->user()->is_admin) {
+       return response()->json(['message' => 'Forbidden'], 403);
+    
+    }
+
+    $planning = Planning::findOrFail($id);
+
+    $planning->update([
+        'statut' => 'accepted',
+        'action' => 'accepted',
+    ]);
+
+    PlanningHistorique::create([
+        'planning_id' => $planning->id,
+        'action' => 'accepted',
+        'comment' => null,
+    ]);
+
+    return response()->json([
+        'message' => 'Planning accepté',
+        'planning' => $planning]);
+}
+
+public function refuse(Request $request, $id)
+{
+   
+    if (!auth()->user()->is_admin) {
+        return response()->json(['message' => 'Forbidden'], 403);
+   
+    }
+
+    $request->validate([
+        'comment' => 'required|string'
+    ]);
+
+    $planning = Planning::findOrFail($id);
+
+    $planning->update([
+        'statut' => 'refused',
+        'action' => 'refused',
+    ]);
+
+    PlanningHistorique::create([
+        'planning_id' => $planning->id,
+        'action' => 'refused',
+        'comment' => $request->comment,
+    ]);
+
+   return response()->json([
+        'message' => 'Planning refusé',
+        'planning' => $planning
+    ]);
 }
 
 }

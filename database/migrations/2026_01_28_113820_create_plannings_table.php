@@ -20,9 +20,12 @@ return new class extends Migration
             $table->string('jour');          
             $table->string('heure');        
             $table->string('salle');
-            $table->enum('statut', ['draft','published'])->default('draft');
+            $table->enum('statut', ['draft','published','accepted','refused'])->default('draft');
+
             $table->string('action')->nullable(); 
+
             $table->json('visible_to');      
+
             $table->timestamps();
         });
     }

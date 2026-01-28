@@ -10,14 +10,23 @@ Route::get('/health',function(){
 
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/plannings/{id}/publish', [PlanningController::class, 'publish']);
+Route::get('/plannings/published',function(){
+    return Planning::where('statut','published')->get();
+});
+
 //|--------------------------------------------------------------------------
+
+Route::middleware('auth:sanctum')->group( function () {
+   Route::post('/plannings/{id}/accept', [PlanningController::class, 'accept']);
+Route::post('/plannings/{id}/refuse', [PlanningController::class, 'refuse']);
+});
+
+Route::middleware('auth:sanctum')->post('/plannings/publish',[PlanningController::class,'publish']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:sanctum')->post('/planning/{planning}/publish',[PlanningController::class,'publish']);
 
 Route::middleware('auth:sanctum')->get('/dashboard', [DashboardController::class,'index']);
 
