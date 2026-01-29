@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('Plannings', function (Blueprint $table) {
+        
+        Schema::create('plannings', function (Blueprint $table) {
+
             $table->id();
             $table->string('niveau');        
             $table->string('groupe');        
@@ -20,21 +22,16 @@ return new class extends Migration
             $table->string('jour');          
             $table->string('heure');        
             $table->string('salle');
-            $table->enum('statut', ['draft','published','accepted','refused'])->default('draft');
-
-            $table->string('action')->nullable(); 
-
-            $table->json('visible_to');      
-
+            $table->enum('statut', ['pending','accepted','refused'])->default('pending');
             $table->timestamps();
+           
         });
     }
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('Plannings');
+        Schema::dropIfExists('plannings');
     }
 };

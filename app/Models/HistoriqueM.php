@@ -3,16 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 use Illuminate\Database\Eloquent\Model;
 
-class Planning extends Model
+class HistoriqueM extends Model
 {
     protected $fillable = [
-        'niveau', 'groupe', 'enseignant', 'module', 
-        'jour', 'heure', 'salle', 'statut'
+        'planning_id', 'admin_id', 'action'
     ];
     public function planning_historiques(){
-        return $this->hasMany(Historiques::class);
+        return $this->belongsTo(Planning::class);
     }
 }

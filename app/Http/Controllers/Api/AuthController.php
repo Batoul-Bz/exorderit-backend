@@ -15,7 +15,7 @@ class AuthController extends Controller
             'password'=>'required'
         ]);
         if(!Auth::attempt($request->only('email','password'))){
-            return response()->json(['message'=>'Invalid credentials'],"vide");
+            return response()->json(['message'=>'Invalid credentials']);
         }
         $user=Auth::user();
         $token=$user->createToken('api')->plainTextToken;

@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Planning;
 use Illuminate\Http\Request;
 
 class PlanningController extends Controller
 {
+    /*
     public function store(Request $request)
     {
         $request->validate([
@@ -19,18 +20,7 @@ class PlanningController extends Controller
             'statut' => 'nullable|in:draft,published',
             'action' => 'nullable|string',
         ]);
-        //example pour affi
-    $planning = Planning::create([
-    'niveau' => '1ère',
-    'groupe' => 'A',
-    'enseignant' => 'Mme. Sara',
-    'module' => 'Math',
-    'jour' => 'Lundi',
-    'heure' => '08:00',
-    'salle' => '101',
-    'statut' => 'draft',// c'est q dire en attente
-    'action' => 'Voir les documents',
-    'visible_to' => ['admin']//permission just pour admin c'est just example pour debut
+      
 ]);
    
     return response()->json($planning);
@@ -75,38 +65,43 @@ public function publish(Request $request, $id)
         'count' => $plannings->count()
     ]);
 }
+*/
+public function index(Request $request)
+{
+    //$user = $request->user();      
+    //$role = $user->role;           
 
-public function accept($id)
+    //$plannings = Planning::whereJsonContains('visible_to', $role)->get();
+
+    return response()->json(['plannings'=> Planning::all()]);
+}
+
+public function accept(Planning $planning)
 {
     
     if (!auth()->user()->is_admin) {
-       return response()->json(['message' => 'Forbidden'], 403);
+       return response()->json(['message' => 'Forbidden']);
     
     }
 
-    $planning = Planning::findOrFail($id);
-
     $planning->update([
         'statut' => 'accepted',
-        'action' => 'accepted',
     ]);
 
-    PlanningHistorique::create([
+    Historique::create([
         'planning_id' => $planning->id,
+        'admin_id' => auth()->id(),
         'action' => 'accepted',
-        'comment' => null,
     ]);
 
-    return response()->json([
-        'message' => 'Planning accepté',
-        'planning' => $planning]);
+    return redirect()->back()->with('success','Planning accepted successfuly');
 }
 
 public function refuse(Request $request, $id)
 {
    
     if (!auth()->user()->is_admin) {
-        return response()->json(['message' => 'Forbidden'], 403);
+        return response()->json(['message' => 'Forbidden']);
    
     }
 
