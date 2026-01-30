@@ -14,9 +14,11 @@ class AuthController extends Controller
             'email'=>'required|email',
             'password'=>'required'
         ]);
+
         if(!Auth::attempt($request->only('email','password'))){
             return response()->json(['message'=>'Invalid credentials']);
         }
+
         $user=Auth::user();
         $token=$user->createToken('api')->plainTextToken;
 
@@ -25,5 +27,9 @@ class AuthController extends Controller
             'role'=>$user->role,
             'user'=>$user
         ]);
+    }
+    public function logout(Request $request){
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message'=>'Logged out']);
     }
 }
