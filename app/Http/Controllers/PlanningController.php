@@ -99,33 +99,42 @@ public function accept(Planning $planning)
 
 public function refuse(Request $request, $id)
 {
+    try{//$user=auth()->user();
+    //if (!$user || $user->is_admin) {
+        response()->json(['message' => 'Forbidden'],403);
    
-    if (!auth()->user()->is_admin) {
-        return response()->json(['message' => 'Forbidden']);
-   
-    }
+   // }
 
     $request->validate([
         'comment' => 'required|string'
-    ]);
+    ],['comment.required'=>'Le comment est requis']);
 
     $planning = Planning::findOrFail($id);
 
     $planning->update([
-        'statut' => 'refused',
-        'action' => 'refused',
+        'statut' => 'pending',
+        //'action' => 'refused',
     ]);
 
     PlanningHistorique::create([
         'planning_id' => $planning->id,
+        'admin_id'=> $user->id,
         'action' => 'refused',
-        'comment' => $request->comment,
+        'comment' => $request->comment, 
+        
     ]);
 
    return response()->json([
         'message' => 'Planning refusé',
         'planning' => $planning
     ]);
+}catch (\Exception $e) {
+        // هذا سيظهر لك الخطأ كـ JSON بدل HTML
+        return response()->json([
+            'message' => 'Internal Server Error',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+   
 }
-
 }
