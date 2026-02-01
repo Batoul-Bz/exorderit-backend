@@ -12,14 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('planning_historique', function (Blueprint $table) {
-             $table->id();
+           $table->id();
 
            $table->foreignId('planning_id')
           ->constrained('plannings')
           ->onDelete('cascade');
 
           $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
+          
+          $table->text('comment')->nullable();
+
           $table->enum('action', ['accepted','refused']);
+
           $table->timestamps();
         });
     }

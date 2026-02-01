@@ -10,8 +10,8 @@ class ProfileChefDController extends Controller
         //$user = Auth::user();
         $user=auth()->user();
 
-        if(!$user){
-            return response()->json(['message'=>'Unauthorized'],401);
+        if(!$user || !$user->is_admin){
+            return response()->json(['message'=>'Unauthorized'],403);
         }
 
         return response()->json([

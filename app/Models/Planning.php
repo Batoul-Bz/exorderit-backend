@@ -12,7 +12,7 @@ class Planning extends Model
         'niveau', 'groupe', 'enseignant', 'module', 
         'jour', 'heure', 'salle', 'statut'
     ];
-    public function planning_historiques(){
-        return $this->hasMany(Historiques::class);
+    public function historiques(){
+        return $this->hasMany(HistoriqueM::class,'planning_id');
     }
 }

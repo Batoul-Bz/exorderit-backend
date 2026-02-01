@@ -2,40 +2,14 @@
 
 namespace App\Http\Controllers;
 use App\Models\Planning;
+
+use App\Models\HistoriqueM;
+
 use Illuminate\Http\Request;
 
 class PlanningController extends Controller
 {
-    /*
-    public function store(Request $request)
-    {
-        $request->validate([
-            'niveau' => 'required|string',
-            'groupe' => 'required|string',
-            'enseignant' => 'required|string',
-            'module' => 'required|string',
-            'jour' => 'required|string',
-            'heure' => 'required|string',
-            'salle' => 'required|string',
-            'statut' => 'nullable|in:draft,published',
-            'action' => 'nullable|string',
-        ]);
-      
-]);
-   
-    return response()->json($planning);
-    }
-
-     public function index(Request $request)
-{
-    $user = $request->user();      
-    $role = $user->role;           
-
-    $plannings = Planning::whereJsonContains('visible_to', $role)->get();
-
-    return response()->json($plannings);
-}
-
+    
 public function publish(Request $request, $id)
 {
     if (!auth()->user()->is_admin) {
@@ -65,22 +39,27 @@ public function publish(Request $request, $id)
         'count' => $plannings->count()
     ]);
 }
-*/
+
 public function index(Request $request)
 {
-    //$user = $request->user();      
+    $user = $request->user();      
     //$role = $user->role;           
+    if(!$user){
+        return response()->json(['message'=>'Not authenticated'],401);
+    }
+    if(!$user->role || $user->role !== 'admin'){
+        return response()->json(['message'=>'Forbiden 1'],403);
+    }
+    $plannings = Planning::all();
 
-    //$plannings = Planning::whereJsonContains('visible_to', $role)->get();
-
-    return response()->json(['plannings'=> Planning::all()]);
+    return response()->json($plannings);
 }
 
 public function accept(Planning $planning)
 {
-    
-    if (!auth()->user()->is_admin) {
-       return response()->json(['message' => 'Forbidden']);
+    $user=auth()->user();
+    if (!$user || $user->role !== 'admin') {
+       return response()->json(['message' => 'Forbidden 2',403]);
     
     }
 
@@ -88,8 +67,7 @@ public function accept(Planning $planning)
         'statut' => 'accepted',
     ]);
 
-    Historique::create([
-        'planning_id' => $planning->id,
+    $planning->historiques()->create([
         'admin_id' => auth()->id(),
         'action' => 'accepted',
     ]);
@@ -99,11 +77,13 @@ public function accept(Planning $planning)
 
 public function refuse(Request $request, $id)
 {
-    try{//$user=auth()->user();
-    //if (!$user || $user->is_admin) {
-        response()->json(['message' => 'Forbidden'],403);
    
-   // }
+    try{
+        $user=auth()->user();
+        if (!$user || $user->role !== 'admin') {
+       return response()->json(['message' => 'Forbidden 3',403]);
+    
+    }
 
     $request->validate([
         'comment' => 'required|string'
@@ -112,7 +92,7 @@ public function refuse(Request $request, $id)
     $planning = Planning::findOrFail($id);
 
     $planning->update([
-        'statut' => 'pending',
+        'statut' => 'refused',
         //'action' => 'refused',
     ]);
 
