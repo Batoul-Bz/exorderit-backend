@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\User;
+
 use App\Models\Planning;
 
 use App\Models\HistoriqueM;
@@ -10,29 +13,44 @@ use Illuminate\Http\Request;
 class PlanningController extends Controller
 {
     
-public function publish(Request $request, $id)
+public function publish(Request $request)
 {
-    if (!auth()->user()->is_admin) {
-        return response()->json(['message' => 'Forbidden'], 403);
+    $user=auth()->user();
+    if (!$user || $user->role !== 'admin') {
+       return response()->json(['message' => 'Forbidden 2',403]);
+    
     }
+
     $plannings = Planning::where('statut', 'accepted')->get();
+
      if ($plannings->isEmpty()) {
         return response()->json([
             'message' => 'Aucun planning accepté à publier'
         ], 400);
     }
 
-    foreach ($plannings as $planning) {
-        $planning->update([
-            'statut' => 'published',
-            'action' => 'published',
+    $user = User::whereIn('role',['teacher','student'])->get();
+
+        Planning::where('statut','accepted')->update([
+           'statut' => 'published',
+    
         ]);
 
-        PlanningHistorique::create([
+        // $plannings->historiques()->create([
+          //  'admin_id' => auth()->id(),
+        //    'planning_id' => $planning->id,
+       
+       // ]);
+       foreach ($plannings as $planning){
+           $planning->historiques()->create([
+            'admin_id' => auth()->id(),
             'planning_id' => $planning->id,
-            'action' => 'published',
-        ]);
-    }
+           ]);
+        }
+        foreach ($users as $user){
+            $user->notify(new NewPlanningNotification($planning));
+        }
+    
 
     return response()->json([
         'message' => 'Tous les plannings acceptés ont été publiés',
@@ -80,36 +98,40 @@ public function refuse(Request $request, $id)
    
     try{
         $user=auth()->user();
-        if (!$user || $user->role !== 'admin') {
-       return response()->json(['message' => 'Forbidden 3',403]);
+    if (!$user || $user->role !== 'admin') {
+       return response()->json(['message' => 'Forbidden 2',403]);
     
     }
 
     $request->validate([
         'comment' => 'required|string'
-    ],['comment.required'=>'Le comment est requis']);
+    ],
+    ['comment.required'=>'Le comment est requis']);
 
     $planning = Planning::findOrFail($id);
 
     $planning->update([
         'statut' => 'refused',
-        //'action' => 'refused',
+    ]);
+    
+     $planning->historiques()->create([
+        'planning_id' => $planning->id,
+        'admin_id' => auth()->id(),
+        'action' => 'refused',
+        'comment' => $request->comment,
     ]);
 
-    PlanningHistorique::create([
-        'planning_id' => $planning->id,
-        'admin_id'=> $user->id,
-        'action' => 'refused',
-        'comment' => $request->comment, 
-        
-    ]);
+    $managers = User::where('role', 'responsable')->get(); 
+        foreach ($managers as $manager) {
+            $manager->notify(new PlanningRefusedNotification($planning, $request->comment));
+        }
 
    return response()->json([
         'message' => 'Planning refusé',
         'planning' => $planning
     ]);
 }catch (\Exception $e) {
-        // هذا سيظهر لك الخطأ كـ JSON بدل HTML
+        
         return response()->json([
             'message' => 'Internal Server Error',
             'error' => $e->getMessage()

@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
-
+namespace App\Http\Controllers\Api;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class ProfileChefDController extends Controller
 {
     public function index(){
         //$user = Auth::user();
-        $user=auth()->user();
+         $user=auth()->user();
+      
 
-        if(!$user || !$user->is_admin){
+        if(!$user || $user->role !== 'admin'){
             return response()->json(['message'=>'Unauthorized'],403);
         }
 

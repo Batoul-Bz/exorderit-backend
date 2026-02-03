@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('jour');          
             $table->string('heure');        
             $table->string('salle');
-            $table->enum('statut', ['pending','accepted','refused'])->default('pending');
+            $table->enum('statut', ['pending','accepted','refused','published'])->default('pending');
             $table->timestamps();
            
         });
