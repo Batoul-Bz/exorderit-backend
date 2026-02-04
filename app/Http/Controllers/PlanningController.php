@@ -33,20 +33,23 @@ public function publish(Request $request)
 
         Planning::where('statut','accepted')->update([
            'statut' => 'published',
-    
         ]);
 
-        // $plannings->historiques()->create([
-          //  'admin_id' => auth()->id(),
-        //    'planning_id' => $planning->id,
+    //$plannings->historiques()->create([
+     //       'admin_id' => auth()->id(),
+      //     'planning_id' => $planning->id,
+       //     'statut' => 'published',
+
        
        // ]);
        foreach ($plannings as $planning){
            $planning->historiques()->create([
             'admin_id' => auth()->id(),
             'planning_id' => $planning->id,
+            'action'=>'published',
            ]);
         }
+        
         foreach ($users as $user){
             $user->notify(new NewPlanningNotification($planning));
         }

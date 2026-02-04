@@ -22,7 +22,7 @@ return new class extends Migration
           
           $table->text('comment')->nullable();
 
-          $table->enum('action', ['accepted','refused']);
+          $table->enum('action', ['accepted','refused','published']);
 
           $table->timestamps();
         });
